@@ -10,6 +10,7 @@ FROM scratch
 
 LABEL org.opencontainers.image.source=https://github.com/computator/duplicacy-container
 
+COPY --from=download /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=download duplicacy.bin /usr/bin/duplicacy
 
 WORKDIR /repo
