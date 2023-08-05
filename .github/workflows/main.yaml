@@ -18,4 +18,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/checkout@v3
       - run: DOCKER_BUILDKIT=1 docker build -f Containerfile -t ${{ env.IMAGE }} .
-      - run: docker push ${{ env.IMAGE }}
+      - run: |
+          for v in "2.7.2"; do
+            docker tag ${{ env.IMAGE }} ${{ env.IMAGE }}:"$v"
+          done
+      - run: docker push -a ${{ env.IMAGE }}
