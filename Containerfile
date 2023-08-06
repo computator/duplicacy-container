@@ -1,10 +1,14 @@
 FROM alpine AS download
 
-ENV DUPLICACY_VERSION=2.7.2
-ENV DUPLICACY_BINARY_URL=https://github.com/gilbertchen/duplicacy/releases/download/v${DUPLICACY_VERSION}/duplicacy_linux_x64_${DUPLICACY_VERSION}
-
-RUN wget $DUPLICACY_BINARY_URL -O duplicacy.bin \
-	&& chmod 755 duplicacy.bin
+RUN set -eux; \
+	DUPLICACY_BINARY_URL=$(\
+		wget --header 'X-GitHub-API-Version: 2022-11-28' -qO - \
+				https://api.github.com/repos/gilbertchen/duplicacy/releases/latest \
+			| grep -e 'browser_download_url.*linux_x64' \
+			| cut -d '"' -f 4\
+		); \
+	wget $DUPLICACY_BINARY_URL -O duplicacy.bin; \
+	chmod 755 duplicacy.bin
 
 FROM gcr.io/distroless/static
 
