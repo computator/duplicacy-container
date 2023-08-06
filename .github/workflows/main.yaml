@@ -19,7 +19,10 @@ jobs:
       - uses: actions/checkout@v3
       - run: DOCKER_BUILDKIT=1 docker build -f Containerfile -t ${{ env.IMAGE }} .
       - run: |
-          for v in "2.7.2"; do
-            docker tag ${{ env.IMAGE }} ${{ env.IMAGE }}:"$v"
-          done
+          VERSION=$(
+            docker run --rm -i ${{ env.IMAGE }} help \
+              | awk '/^VERSION/ { l = NR + 1 }; NR == l && $1 ~ /^[0-9.]+$/ { print $1 }'
+            )
+          [ -n "$VERSION" ] || exit
+          docker tag ${{ env.IMAGE }} ${{ env.IMAGE }}:"$v"
       - run: docker push -a ${{ env.IMAGE }}
