@@ -22,7 +22,7 @@ jobs:
           VERSION=$(
             docker run --rm -i ${{ env.IMAGE }} help \
               | awk '/^VERSION/ { l = NR + 1 }; NR == l && $1 ~ /^[0-9.]+$/ { print $1 }'
-            )
+          )
           [ -n "$VERSION" ] || exit
-          docker tag ${{ env.IMAGE }} ${{ env.IMAGE }}:"$v"
+          docker tag ${{ env.IMAGE }} ${{ env.IMAGE }}:"$VERSION"
       - run: docker push -a ${{ env.IMAGE }}
