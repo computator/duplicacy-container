@@ -1,4 +1,4 @@
-FROM alpine AS download
+FROM docker.io/library/alpine AS download
 
 RUN set -eux; \
 	DUPLICACY_BINARY_URL=$(\
