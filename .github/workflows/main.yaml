@@ -41,7 +41,8 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - run: podman build -t ${{ env.IMAGE }} .
+      # TODO: switch to --pull=newer once supported https://github.com/containers/podman/issues/22845
+      - run: podman build --pull=always -t ${{ env.IMAGE }} .
 
       - name: Add image version tag
         run: |
@@ -65,7 +66,15 @@ jobs:
         run: |
           rm -f "${IMGCACHE_PATH:?}"
           echo "Saving Images:"
-          podman image list --all --format '{{ range .RepoTags }}{{ . }}\n{{ else }}{{ .ID }}{{ end }}' | sort -u \
+          {
+            # build cache (dangling images that have labeled root ancestors)
+            for img in $(podman image list -q --filter dangling=true); do
+              root=$( i="$img" t="$i"; while [ -n "$i" ]; do t="$i" i="$(podman image inspect -f '{{ .Parent }}' "$i")"; done; echo "$t"; )
+              [ "$(podman image inspect -f '{{ len .RepoTags }}' "$root")" -gt 0 ] && echo "$img"
+            done
+            # labeled images
+            podman image list --filter dangling=false --format '{{ range .Names }}{{ . }} {{ end }}' | xargs -n 1 | sort -u
+          } \
             | tee /dev/stderr \
             | xargs podman save -m -o "${IMGCACHE_PATH:?}" \
             || echo "::error::Failure while exporting images to cache"
