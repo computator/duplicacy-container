@@ -38,7 +38,8 @@ jobs:
         run: |
           podman load -i "${IMGCACHE_PATH:?}" \
             || echo "::warning::Failure while importing images from cache"
-          echo "\nImage Status:"
+          echo
+          echo "Image Status:"
           podman image list
 
       - uses: actions/checkout@v4
@@ -68,8 +69,9 @@ jobs:
         run: |
           echo "Existing Images:"
           podman image list
+          echo
+          echo "Saving Images:"
           rm -f "${IMGCACHE_PATH:?}"
-          echo "\nSaving Images:"
           {
             # build cache (dangling or intermediate images that have labeled root ancestors)
             for img in $(podman image list -q --filter dangling=true) $(podman image list -q --filter intermediate=true); do
