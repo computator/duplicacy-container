@@ -38,6 +38,8 @@ jobs:
         run: |
           podman load -i "${IMGCACHE_PATH:?}" \
             || echo "::warning::Failure while importing images from cache"
+          echo "Image Status"
+          podman image list
 
       - uses: actions/checkout@v4
 
@@ -63,6 +65,8 @@ jobs:
         name: Export images to cache
         continue-on-error: true
         run: |
+          echo "Existing Images:"
+          podman image list
           rm -f "${IMGCACHE_PATH:?}"
           echo "Saving Images:"
           {
