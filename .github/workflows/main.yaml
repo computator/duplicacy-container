@@ -38,12 +38,13 @@ jobs:
         run: |
           podman load -i "${IMGCACHE_PATH:?}" \
             || echo "::warning::Failure while importing images from cache"
-          echo "Image Status"
+          echo "\nImage Status:"
           podman image list
 
       - uses: actions/checkout@v4
 
-      - run: podman build -t ${{ env.IMAGE }} .
+      # TODO: switch to --pull=newer once supported https://github.com/containers/podman/issues/22845
+      - run: podman build --pull=always -t ${{ env.IMAGE }} .
 
       - name: Add image version tag
         run: |
@@ -68,10 +69,10 @@ jobs:
           echo "Existing Images:"
           podman image list
           rm -f "${IMGCACHE_PATH:?}"
-          echo "Saving Images:"
+          echo "\nSaving Images:"
           {
-            # build cache (dangling images that have labeled root ancestors)
-            for img in $(podman image list -q --filter dangling=true); do
+            # build cache (dangling or intermediate images that have labeled root ancestors)
+            for img in $(podman image list -q --filter dangling=true) $(podman image list -q --filter intermediate=true); do
               root=$( i="$img" t="$i"; while [ -n "$i" ]; do t="$i" i="$(podman image inspect -f '{{ .Parent }}' "$i")"; done; echo "$t"; )
               [ "$(podman image inspect -f '{{ len .RepoTags }}' "$root")" -gt 0 ] && echo "$img"
             done
