@@ -18,11 +18,12 @@ jobs:
       BUILDAH_FORMAT: docker
     steps:
       - id: get-release-ver
+        name: Fetch latest release version
         run: |
           curl -H 'X-GitHub-API-Version: 2022-11-28' -sS https://api.github.com/repos/gilbertchen/duplicacy/releases/latest \
             | jq -r .tag_name \
             | sed s/^v// \
-            | xargs -I{} printf 'version=%s\n' {}
+            | xargs -I{} printf 'version=%s\n' {} \
             > "$GITHUB_OUTPUT"
 
       - env:
