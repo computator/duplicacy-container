@@ -1,0 +1,17 @@
+[Unit]
+Description=Duplicacy Backup
+Wants=network-online.target
+After=network-online.target
+
+[Container]
+Image=ghcr.io/computator/duplicacy
+Network=host
+
+Volume=%h:/repo
+Secret=duplicacy_key,type=env,target=DUPLICACY_PASSWORD
+
+Volume=${SSH_AUTH_SOCK}:/ssh.sock
+Environment=SSH_AUTH_SOCK=/ssh.sock
+Environment=DUPLICACY_SSH_KEY_FILE=/dev/null
+
+Exec=-log -s PACK_END backup -threads 6
