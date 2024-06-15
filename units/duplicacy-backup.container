@@ -15,3 +15,9 @@ Environment=SSH_AUTH_SOCK=/ssh.sock
 Environment=DUPLICACY_SSH_KEY_FILE=/dev/null
 
 Exec=-log -s PACK_END backup -threads 6
+
+[Service]
+Restart=on-failure
+RestartSec=1m
+RestartSteps=5
+RestartMaxDelaySec=6h
