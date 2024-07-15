@@ -15,6 +15,7 @@ Environment=SSH_AUTH_SOCK=/ssh.sock
 Environment=DUPLICACY_SSH_KEY_FILE=/dev/null
 
 Exec=-log prune \
+	-all \
 	-threads 4 \
 	-keep 180:360 \
 	-keep 30:120 \
